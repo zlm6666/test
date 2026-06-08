@@ -482,6 +482,31 @@
 
     document.getElementById('btn-back-2').onclick = () => setStep(1);
     document.getElementById('btn-next-2').onclick = () => {
+        const email = emailInput.value.trim();
+        const pwd = passwordInput.value.trim();
+
+        // 邮箱格式校验（反人类风格：该有的都有但就是要刁难你）
+        if (!email) {
+            showMessage("电子邮箱不能为空");
+            return;
+        }
+        if (!email.includes('@') || !email.includes('.')) {
+            showMessage("电子邮箱格式异常，请检查输入");
+            return;
+        }
+        const atIdx = email.indexOf('@');
+        const dotPart = email.slice(atIdx + 1);
+        if (!dotPart || !dotPart.includes('.') || dotPart.endsWith('.')) {
+            showMessage("电子邮箱格式异常，请检查输入");
+            return;
+        }
+
+        // 密码位数校验（不说具体位数，让你猜）
+        if (pwd.length < 6) {
+            showMessage("密码强度不足，请重新设置");
+            return;
+        }
+
         if (passwordAttempts < 3) {
             passwordAttempts++;
             showMessage("该密码已存在");
