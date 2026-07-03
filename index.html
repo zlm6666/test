@@ -3,92 +3,1339 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Zone</title>
+    <title>笑的主页 | 笑的导航页</title>
+    
+    <!-- 加载LXGW WenKai字体 -->
+    <script src="/mtp/home/rocket-loader.min.js" data-cf-settings="acd9ac0b6f8f68691bad4fd8-|49"></script><link href="https://fontsapi.zeoseven.com/292/main/result.css" onload="this.rel='stylesheet'" rel="preload" as="style" crossorigin />
+    <noscript><link rel="stylesheet" href="https://fontsapi.zeoseven.com/292/main/result.css" /></noscript>
+    
+    <!-- 加载Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 加载MDUI CSS -->
+    <link rel="stylesheet" href="/css/mdui.min.css">
+    
+    <!-- 加载Qexo友链组件CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/qexo-friends/friends.css"/>
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            font-family: "LXGW WenKai";
+            font-weight: normal;
+        }
+    </style>
+    
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            /* 设置背景图片 */
+            background-image: url('https://www.yumus.cn/api/?target=img&brand=bing&ua=m');
+            background-size: cover; /* 使背景图覆盖整个页面 */
+            background-position: center center; /* 背景图居中 */
+            background-repeat: no-repeat; /* 防止背景图重复 */
+            background-attachment: fixed; /* 背景图固定，不随滚动而移动 */
+            
+            /* 设置最小高度以确保背景完全显示 */
+            min-height: 100vh;
+            
+            /* 防止内容溢出的安全措施 */
+            overflow: hidden;
+            
+            /* 添加相对定位，使蒙版可以相对于body定位 */
+            position: relative;
+            
+            /* 使用flexbox使内容居中 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* 黑色蒙版 - 固定透明度为30% */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3); /* 固定30%透明度 */
+            z-index: 1;
+            pointer-events: none; /* 禁用蒙版的交互事件 */
+        }
+        
+        /* MDUI加载动画 - 全屏黑色蒙版 */
+        #mdui-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9); /* 深色半透明背景 */
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        #mdui-loading.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .mdui-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #2196F3;
+            border-radius: 50%;
+            animation: mdui-spinner-rotate 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes mdui-spinner-rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .loading-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-family: "LXGW WenKai", "Arial", sans-serif;
+            font-size: 18px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        }
+        
+        /* 主内容容器 */
+        .main-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            color: #e0e0e0;
-            padding: 2rem;
+            align-items: center;
         }
-        .container { text-align: center; max-width: 600px; }
-        .badge {
-            display: inline-block;
-            padding: 4px 16px;
-            border-radius: 20px;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.12);
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: #888;
-            margin-bottom: 2rem;
-        }
-        h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
-        }
-        .subtitle {
-            color: #999;
-            font-size: 1.1rem;
-            margin-bottom: 3rem;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            padding-bottom: 2rem;
-        }
-        .links {
+        
+        /* 头像容器 */
+        .avatar-container {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
-            width: 100%;
-            max-width: 360px;
-            margin: 0 auto;
+            align-items: center;
+            flex-grow: 1;
+            justify-content: center;
+            padding-bottom: 80px; /* 为页脚留出空间 */
         }
-        .links a {
+        
+        /* 圆形头像 - 边框为半透明黑色 */
+        .avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-image: url('https://wp-cdn.4ce.cn/v2/TVFIv5x.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border: 5px solid rgba(0, 0, 0, 0.5); /* 半透明黑色边框，50%透明度 */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        /* 头像悬停效果 */
+        .avatar:hover {
+            transform: scale(1.05);
+            border-color: rgba(0, 0, 0, 0.7); /* 悬停时透明度增加 */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7);
+        }
+        
+        /* 头像标题 - 使用LXGW WenKai字体 */
+        .avatar-title {
+            margin-top: 20px;
+            color: white;
+            font-family: "LXGW WenKai", "Arial", sans-serif;
+            font-size: 24px;
+            font-weight: normal;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+        
+        /* 副标题容器 */
+        .subtitle-container {
+            margin-top: 15px;
+            min-height: 60px; /* 为打字机效果预留高度 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        /* 副标题样式 - 打字机效果 */
+        .subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-family: "LXGW WenKai", "Arial", sans-serif;
+            font-size: 16px;
+            font-weight: normal;
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9);
+            letter-spacing: 0.5px;
+            opacity: 0.85;
+            text-align: center;
+            line-height: 1.6;
+            max-width: 400px;
+            padding: 0 20px;
+            
+            /* 移除原来的边框光标 */
+            white-space: nowrap; /* 防止换行 */
+            overflow: hidden; /* 隐藏溢出内容 */
+        }
+        
+        /* 枫叶光标容器 */
+        .cursor-container {
+            display: inline-block;
+            margin-left: 2px;
+            vertical-align: middle;
+            height: 1em; /* 与文字高度相同 */
+            line-height: 1;
+        }
+        
+        /* 枫叶光标样式 - 移除闪烁 */
+        .leaf-cursor {
+            display: inline-block;
+            font-size: 1em; /* 与文字大小相同 */
+            color: rgba(255, 107, 107, 0.9); /* 枫叶红色 */
+            transform: translateY(2px); /* 微调垂直位置 */
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+            opacity: 0.9; /* 固定不透明度，不闪烁 */
+        }
+        
+        /* 打字机逐字出现动画 */
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        /* 标签容器 */
+        .tags-container {
+            display: flex;
+            gap: 20px; /* 标签间距 */
+            margin-top: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        /* 单个标签样式 */
+        .tag {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 14px 24px;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            color: #ccc;
+            gap: 8px;
+            padding: 8px 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.85);
+            font-family: "LXGW WenKai", "Arial", sans-serif;
+            font-size: 14px;
+            font-weight: normal;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+        
+        /* 标签悬停效果 */
+        .tag:hover {
+            transform: translateY(-3px);
+            background-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* 标签图标样式 */
+        .tag-icon {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        /* 不同标签的特殊样式 */
+        .gender {
+            background-color: rgba(66, 133, 244, 0.15);
+            border-color: rgba(66, 133, 244, 0.3);
+        }
+        
+        .gender:hover {
+            background-color: rgba(66, 133, 244, 0.25);
+        }
+        
+        .age {
+            background-color: rgba(52, 168, 83, 0.15);
+            border-color: rgba(52, 168, 83, 0.3);
+        }
+        
+        .age:hover {
+            background-color: rgba(52, 168, 83, 0.25);
+        }
+        
+        .birthday {
+            background-color: rgba(234, 67, 53, 0.15);
+            border-color: rgba(234, 67, 53, 0.3);
+        }
+        
+        .birthday:hover {
+            background-color: rgba(234, 67, 53, 0.25);
+        }
+        
+        /* 功能按钮容器 */
+        .function-buttons {
+            display: flex;
+            gap: 25px; /* 按钮间距 */
+            margin-top: 25px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        /* 功能按钮样式 - 横向排列 */
+        .function-button {
+            display: flex;
+            align-items: center; /* 垂直居中 */
+            justify-content: center; /* 水平居中 */
+            gap: 12px; /* 图标和文字间距 */
+            padding: 12px 25px;
+            border-radius: 25px;
+            background-color: rgba(255, 255, 255, 0.08);
+            color: white;
+            font-family: "LXGW WenKai", "Arial", sans-serif;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.15);
             text-decoration: none;
-            transition: all 0.25s;
-            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
         }
-        .links a:hover {
-            background: rgba(255,255,255,0.08);
-            border-color: rgba(255,255,255,0.18);
-            color: #fff;
-            transform: translateY(-2px);
+        
+        /* 功能按钮图标 */
+        .button-icon {
+            font-size: 20px;
+            transition: all 0.3s ease;
         }
-        .links a .arrow { color: #555; transition: transform 0.25s; }
-        .links a:hover .arrow { transform: translateX(4px); color: #888; }
-        .footer { margin-top: 4rem; font-size: 0.8rem; color: #555; }
+        
+        /* 功能按钮文字 */
+        .button-text {
+            font-size: 16px;
+            opacity: 0.9;
+            letter-spacing: 0.5px;
+            font-weight: normal;
+        }
+        
+        /* 功能按钮悬停效果 */
+        .function-button:hover {
+            transform: translateY(-5px);
+            background-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .function-button:hover .button-icon {
+            transform: scale(1.2);
+        }
+        
+        /* 小地图按钮特殊样式 */
+        .sitemap-button {
+            background-color: rgba(66, 133, 244, 0.15);
+            border-color: rgba(66, 133, 244, 0.3);
+        }
+        
+        .sitemap-button:hover {
+            background-color: rgba(66, 133, 244, 0.25);
+        }
+        
+        /* 友情链接按钮特殊样式 */
+        .friends-button {
+            background-color: rgba(234, 67, 53, 0.15);
+            border-color: rgba(234, 67, 53, 0.3);
+        }
+        
+        .friends-button:hover {
+            background-color: rgba(234, 67, 53, 0.25);
+        }
+        
+        /* 按钮发光效果 */
+        .function-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 25px;
+            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .function-button:hover::before {
+            opacity: 1;
+        }
+        
+        /* 社交媒体图标容器 */
+        .social-icons {
+            display: flex;
+            gap: 25px; /* 图标间距 */
+            margin-top: 25px;
+            justify-content: center;
+        }
+        
+        /* 图标样式 - 移除下划线 */
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-decoration: none !important; /* 移除下划线 */
+        }
+        
+        /* 移除所有链接的下划线 */
+        a {
+            text-decoration: none;
+        }
+        
+        /* 图标悬停效果 */
+        .social-icon:hover {
+            transform: translateY(-5px) scale(1.1);
+            background-color: rgba(255, 255, 255, 0.2);
+            text-decoration: none !important; /* 确保悬停时也没有下划线 */
+        }
+        
+        /* 各个图标的特殊颜色效果 */
+        .github:hover {
+            background-color: rgba(24, 23, 23, 0.8);
+            color: #f0f6fc;
+        }
+        
+        .qq:hover {
+            background-color: rgba(0, 153, 255, 0.8);
+            color: white;
+        }
+        
+        .mail:hover {
+            background-color: rgba(234, 67, 53, 0.8);
+            color: white;
+        }
+        
+        .telegram:hover {
+            background-color: rgba(0, 136, 204, 0.8);
+            color: white;
+        }
+        
+        .netease-music:hover {
+            background-color: rgba(224, 33, 41, 0.8);
+            color: white;
+        }
+        
+        /* 页脚样式 - 透明背景，单行居中，完全显示 */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 0;
+            z-index: 3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* 透明背景 */
+            background-color: transparent;
+            backdrop-filter: none;
+        }
+        
+        .footer-content {
+            color: rgba(255, 255, 255, 0.7);
+            font-family: "LXGW WenKai", "Arial", sans-serif;
+            font-size: 14px;
+            text-align: center;
+            line-height: 1;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+            white-space: nowrap; /* 确保单行显示 */
+            /* 移除省略号和溢出隐藏 */
+            overflow: visible;
+            text-overflow: clip;
+            max-width: 100%;
+            padding: 0 10px;
+        }
+        
+        .footer a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0 3px;
+        }
+        
+        .footer a:hover {
+            color: white;
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
+        }
+        
+        .footer a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.6);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .footer a:hover::after {
+            transform: scaleX(1);
+        }
+        
+        .footer-separator {
+            margin: 0 10px;
+            color: rgba(255, 255, 255, 0.5);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+        }
+        
+        /* 模态框遮罩 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); /* 深色遮罩 */
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* 模态框内容 */
+        .modal-content {
+            background-color: rgba(30, 30, 40, 0.95);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 1100px;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateY(30px);
+            transition: transform 0.4s ease;
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        /* 模态框头部 */
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            font-family: "LXGW WenKai", "Arial", sans-serif;
+            font-size: 24px;
+            font-weight: normal;
+        }
+        
+        .modal-title-icon {
+            font-size: 24px;
+        }
+        
+        .sitemap-modal .modal-title-icon {
+            color: #4285f4;
+        }
+        
+        .friends-modal .modal-title-icon {
+            color: #ea4335;
+        }
+        
+        /* 关闭按钮 */
+        .close-button {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .close-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: rotate(90deg);
+        }
+        
+        /* 模态框主体 - 适配Qexo友链组件 */
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        
+        /* 确保Qexo友链组件在深色背景下可读 */
+        #qexo-friends {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* 调整Qexo友链组件在模态框中的样式 */
+        .friend-card {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        .friend-card:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+        
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-family: "LXGW WenKai", "Arial", sans-serif;
+            font-size: 18px;
+            padding: 40px;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: #4285f4;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 响应式优化 */
+        @media (max-width: 768px) {
+            body {
+                background-attachment: scroll; /* 在移动设备上改为滚动背景 */
+            }
+            
+            /* 移动设备上调整头像大小 */
+            .avatar {
+                width: 120px;
+                height: 120px;
+                border-width: 4px; /* 移动设备上边框稍微细一点 */
+            }
+            
+            /* 移动设备上调整标题大小 */
+            .avatar-title {
+                font-size: 20px;
+            }
+            
+            /* 移动设备上调整副标题容器 */
+            .subtitle-container {
+                margin-top: 12px;
+                min-height: 50px;
+            }
+            
+            /* 移动设备上调整副标题大小 */
+            .subtitle {
+                font-size: 14px;
+                padding: 0 15px;
+                max-width: 300px;
+                white-space: normal; /* 在小屏幕上允许换行 */
+            }
+            
+            /* 移动设备上调整枫叶光标大小 */
+            .leaf-cursor {
+                font-size: 0.9em;
+            }
+            
+            /* 移动设备上调整标签样式 */
+            .tags-container {
+                gap: 12px;
+                margin-top: 18px;
+            }
+            
+            .tag {
+                padding: 6px 12px;
+                font-size: 13px;
+                gap: 6px;
+            }
+            
+            .tag-icon {
+                font-size: 13px;
+            }
+            
+            /* 移动设备上调整功能按钮 */
+            .function-buttons {
+                gap: 15px;
+                margin-top: 22px;
+            }
+            
+            .function-button {
+                padding: 10px 18px;
+                gap: 8px;
+                border-radius: 20px;
+            }
+            
+            .button-icon {
+                font-size: 18px;
+            }
+            
+            .button-text {
+                font-size: 14px;
+            }
+            
+            /* 移动设备上调整图标大小和间距 */
+            .social-icons {
+                gap: 15px;
+                margin-top: 22px;
+            }
+            
+            .social-icon {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+            
+            /* 移动设备上调整页脚 - 确保完全显示 */
+            .footer {
+                padding: 10px 0;
+            }
+            
+            .footer-content {
+                font-size: 12px;
+                padding: 0 5px;
+                white-space: nowrap;
+                /* 确保内容完全显示 */
+                overflow: visible;
+                text-overflow: clip;
+                /* 允许水平滚动 */
+                max-width: 100%;
+            }
+            
+            .footer-separator {
+                margin: 0 5px;
+            }
+            
+            /* 移动设备上调整模态框 */
+            .modal-content {
+                width: 95%;
+                max-height: 90vh;
+            }
+            
+            .modal-header {
+                padding: 15px 20px;
+            }
+            
+            .modal-title {
+                font-size: 20px;
+            }
+            
+            .modal-title-icon {
+                font-size: 20px;
+            }
+            
+            .modal-body {
+                padding: 20px;
+            }
+        }
+        
+        /* 小屏幕手机优化 */
+        @media (max-width: 480px) {
+            .footer-content {
+                font-size: 11px;
+                padding: 0 2px;
+            }
+            
+            .footer-separator {
+                margin: 0 3px;
+            }
+        }
+        
+        /* 超小屏幕优化 - 确保页脚内容完全可见 */
+        @media (max-width: 320px) {
+            .footer-content {
+                font-size: 10px;
+                padding: 0 1px;
+                letter-spacing: -0.2px; /* 稍微减少字母间距以节省空间 */
+            }
+            
+            .footer-separator {
+                margin: 0 2px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="badge">⚡ Test Workspace</div>
-        <h1>Test Zone</h1>
-        <p class="subtitle">zlm6666 的开发测试靶场</p>
-        <div class="links">
-            <a href="163music.html">
-                <span>🎵 网易云音乐解析</span>
-                <span class="arrow">→</span>
+    <!-- MDUI加载动画 - 全屏黑色蒙版 -->
+    <div id="mdui-loading">
+        <div class="mdui-spinner"></div>
+        <div class="loading-text">加载中...</div>
+    </div>
+    
+    <!-- 黑色蒙版 - 固定30%透明度 -->
+    <div class="overlay"></div>
+    
+    <!-- 主内容容器 -->
+    <div class="main-content">
+        <!-- 头像容器 -->
+        <div class="avatar-container">
+            <div class="avatar" id="avatar"></div>
+            <div class="avatar-title">笑</div>
+            
+            <!-- 副标题容器 -->
+            <div class="subtitle-container">
+                <div class="subtitle" id="subtitle"></div>
+                <!-- 枫叶光标容器 -->
+                <div class="cursor-container" id="cursor">
+                    <i class="fas fa-leaf leaf-cursor"></i>
+                </div>
+            </div>
+            
+            <!-- 标签容器 -->
+            <div class="tags-container">
+                <!-- 性别标签 -->
+                <div class="tag gender">
+                    <i class="fas fa-mars tag-icon"></i>
+                    <span>男</span>
+                </div>
+                
+                <!-- 年龄标签 -->
+                <div class="tag age">
+                    <i class="fas fa-birthday-cake tag-icon"></i>
+                    <span>17</span>
+                </div>
+                
+                <!-- 生日标签 -->
+                <div class="tag birthday">
+                    <i class="fas fa-calendar-alt tag-icon"></i>
+                    <span>2008-12-19</span>
+                </div>
+            </div>
+            
+            <!-- 功能按钮容器 -->
+            <div class="function-buttons">
+                <!-- 小地图按钮 -->
+                <a href="#" class="function-button sitemap-button" id="sitemap-button" title="小地图">
+                    <i class="fas fa-map button-icon"></i>
+                    <span class="button-text">小地图</span>
+                </a>
+                
+                <!-- 友情链接按钮 -->
+                <a href="#" class="function-button friends-button" id="friends-button" title="友情链接">
+                    <i class="fas fa-users button-icon"></i>
+                    <span class="button-text">友情链接</span>
+                </a>
+            </div>
+            
+            <!-- 社交媒体图标 -->
+            <div class="social-icons">
+                <!-- GitHub -->
+                <a href="https://github.com/zlm6666" class="social-icon github" id="github-icon" title="GitHub" target="_blank">
+                    <i class="fab fa-github"></i>
+                </a>
+                
+                <!-- QQ -->
+                <a href="https://qm.qq.com/q/i844droz8k?from=tim" class="social-icon qq" id="qq-icon" title="QQ" target="_blank">
+                    <i class="fab fa-qq"></i>
+                </a>
+                
+                <!-- 邮箱 -->
+                <a href="mailto:548541786@qq.com" class="social-icon mail" id="mail-icon" title="邮箱">
+                    <i class="fas fa-envelope"></i>
+                </a>
+                
+                <!-- Telegram -->
+                <a href="https://t.me/qmyyxiao" class="social-icon telegram" id="telegram-icon" title="Telegram" target="_blank">
+                    <i class="fab fa-telegram"></i>
+                </a>
+                
+            </div>
+        </div>
+    </div>
+    
+    <!-- 页脚 - 透明背景，单行居中，完全显示 -->
+    <footer class="footer">
+        <div class="footer-content">
+            Copyright &copy; EdgeCat
+            <span class="footer-separator">｜</span>
+            <a href="https://icp.gov.moe/?keyword=20251885" target="_blank" rel="noopener noreferrer" title="萌ICP备20251885号">
+                MoeICP 20251885
             </a>
         </div>
-        <div class="footer">xiao · managed by ima.copilot</div>
+    </footer>
+    
+    <!-- 小地图模态框 -->
+    <div class="modal-overlay" id="sitemap-modal">
+        <div class="modal-content sitemap-modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-map modal-title-icon"></i>
+                    <span>小地图</span> <!-- 改为"小地图" -->
+                </div>
+                <button class="close-button" id="close-sitemap">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="sitemap-content">
+                <!-- 小地图内容将动态加载到这里 -->
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div>加载小地图...</div>
+                </div>
+            </div>
+        </div>
     </div>
+    
+    <!-- 友情链接模态框 - 直接嵌入Qexo友链组件 -->
+    <div class="modal-overlay" id="friends-modal">
+        <div class="modal-content friends-modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-users modal-title-icon"></i>
+                    <span>友情链接</span>
+                </div>
+                <button class="close-button" id="close-friends">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="friends-content">
+                <!-- 直接嵌入Qexo友链组件 -->
+                <div id="qexo-friends"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 加载MDUI JS -->
+    <script data-cfasync="false" src="/mtp/home/email-decode.min.js"></script><script src="/js/mdui.min.js" type="acd9ac0b6f8f68691bad4fd8-text/javascript"></script>
+    
+    <!-- 加载Qexo友链组件JS -->
+    <script src="/mtp/home/friends.js"></script>
+    
+    <script type="acd9ac0b6f8f68691bad4fd8-text/javascript">
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            const avatar = document.getElementById('avatar');
+            const subtitle = document.getElementById('subtitle');
+            const cursor = document.getElementById('cursor');
+            const sitemapButton = document.getElementById('sitemap-button');
+            const friendsButton = document.getElementById('friends-button');
+            const sitemapModal = document.getElementById('sitemap-modal');
+            const friendsModal = document.getElementById('friends-modal');
+            const closeSitemap = document.getElementById('close-sitemap');
+            const closeFriends = document.getElementById('close-friends');
+            const sitemapContent = document.getElementById('sitemap-content');
+            const mduiLoading = document.getElementById('mdui-loading');
+            
+            // 隐藏光标初始化
+            cursor.style.display = 'none';
+            
+            // 显示加载动画
+            function showLoading() {
+                mduiLoading.classList.remove('hidden');
+            }
+            
+            // 隐藏加载动画
+            function hideLoading() {
+                mduiLoading.classList.add('hidden');
+            }
+            
+            // 打字机效果函数
+            function typeWriter(element, text, speed = 100) {
+                let i = 0;
+                element.innerHTML = '';
+                cursor.style.display = 'inline-block';
+                cursor.style.opacity = '0.9'; // 固定不透明度，不闪烁
+                
+                function type() {
+                    if (i < text.length) {
+                        element.innerHTML += text.charAt(i);
+                        i++;
+                        setTimeout(type, speed);
+                    } else {
+                        // 打字完成后，显示固定枫叶光标（不闪烁）
+                        cursor.style.opacity = '0.9';
+                    }
+                }
+                
+                type();
+            }
+            
+            // 页面加载完成后启动
+            window.addEventListener('load', function() {
+                // 延迟1秒后隐藏加载动画
+                setTimeout(() => {
+                    hideLoading();
+                    
+                    // 延迟500毫秒后开始打字机效果
+                    setTimeout(() => {
+                        // 设置副标题文本
+                        const subtitleText = "山重水复疑无路，柳暗花明又一村";
+                        typeWriter(subtitle, subtitleText, 120);
+                        
+                        // 预加载小地图数据
+                        loadSitemapData();
+                        
+                        // 初始化Qexo友链组件
+                        if (typeof loadQexoFriends === 'function') {
+                            loadQexoFriends("qexo-friends", "https://friends.xiaow.qzz.io");
+                        }
+                    }, 500);
+                }, 1000);
+            });
+            
+            // 头像点击效果
+            avatar.addEventListener('click', function() {
+                // 添加点击脉冲效果
+                this.style.transform = 'scale(1.1)';
+                this.style.borderColor = 'rgba(0, 0, 0, 0.9)'; /* 点击时边框变为几乎不透明 */
+                this.style.boxShadow = '0 0 30px rgba(0, 0, 0, 0.7)';
+                
+                // 300毫秒后恢复
+                setTimeout(() => {
+                    this.style.transform = '';
+                    this.style.borderColor = '';
+                    this.style.boxShadow = '';
+                }, 300);
+            });
+            
+            // 鼠标移入时边框变深
+            avatar.addEventListener('mouseenter', function() {
+                this.style.borderColor = 'rgba(0, 0, 0, 0.7)';
+            });
+            
+            // 鼠标移出时恢复半透明黑色边框
+            avatar.addEventListener('mouseleave', function() {
+                if (!this.style.transform.includes('scale(1.1)')) {
+                    this.style.borderColor = 'rgba(0, 0, 0, 0.5)';
+                }
+            });
+            
+            // 社交媒体图标点击事件
+            const socialIcons = document.querySelectorAll('.social-icon');
+            socialIcons.forEach(icon => {
+                // 移除阻止默认行为的代码，让链接正常工作
+                icon.addEventListener('click', function() {
+                    // 添加点击反馈，但不阻止链接跳转
+                    this.style.transform = 'scale(0.9)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
+            
+            // 标签点击效果
+            const tags = document.querySelectorAll('.tag');
+            tags.forEach(tag => {
+                tag.addEventListener('click', function() {
+                    // 添加点击反馈
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
+            
+            // 小地图按钮点击事件
+            sitemapButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                // 添加点击反馈
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 200);
+                
+                // 显示加载动画
+                showLoading();
+                
+                // 延迟300毫秒后显示小地图模态框
+                setTimeout(() => {
+                    hideLoading();
+                    showModal('sitemap');
+                }, 300);
+            });
+            
+            // 友人帐按钮点击事件
+            friendsButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                // 添加点击反馈
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 200);
+                
+                // 显示加载动画
+                showLoading();
+                
+                // 延迟300毫秒后显示友人帐模态框
+                setTimeout(() => {
+                    hideLoading();
+                    showModal('friends');
+                }, 300);
+            });
+            
+            // 关闭按钮事件
+            closeSitemap.addEventListener('click', function() {
+                hideModal('sitemap');
+            });
+            
+            closeFriends.addEventListener('click', function() {
+                hideModal('friends');
+            });
+            
+            // 点击模态框外部关闭
+            sitemapModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideModal('sitemap');
+                }
+            });
+            
+            friendsModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideModal('friends');
+                }
+            });
+            
+            // 显示模态框函数
+            function showModal(type) {
+                if (type === 'sitemap') {
+                    sitemapModal.classList.add('active');
+                    // 确保内容已加载
+                    if (!sitemapDataLoaded) {
+                        loadSitemapData();
+                    }
+                } else if (type === 'friends') {
+                    friendsModal.classList.add('active');
+                }
+                
+                // 禁止背景滚动
+                document.body.style.overflow = 'hidden';
+            }
+            
+            // 隐藏模态框函数
+            function hideModal(type) {
+                if (type === 'sitemap') {
+                    sitemapModal.classList.remove('active');
+                } else if (type === 'friends') {
+                    friendsModal.classList.remove('active');
+                }
+                
+                // 恢复背景滚动
+                document.body.style.overflow = '';
+            }
+            
+            // 小地图数据
+            let sitemapDataLoaded = false;
+            const sitemapData = [
+                {
+                    name: "首页",
+                    url: "/",
+                    icon: "fas fa-home"
+                },
+                {
+                    name: "博客",
+                    url: "https://blog.xiaow.qzz.io",
+                    icon: "fas fa-blog"
+                },
+                {
+                    name: "图床",
+                    url: "/image",
+                    icon: "fas fa-images"
+                },
+                {
+                    name: "网易云音乐解析",
+                    url: "/163music",
+                    icon: "fab fa-napster"
+                },
+                {
+                    name: "弱智吧话题",
+                    url: "/nzjsb",
+                    icon: "fas fa-brain"
+                },
+                {
+                    name: "Staggering Beauty",
+                    url: "/staggeringbeauty",
+                    icon: "fas fa-star"
+                },
+                {
+                    name: "【维护中】番茄小说下载",
+                    url: "/fq",
+                    icon: "fas fa-book"
+                },
+                {
+                    name: "反人类注册系统·娱乐",
+                    url: "/sign-up",
+                    icon: "fas fa-user-plus"
+                },
+                {
+                    name: "谁是卧底线下游戏",
+                    url: "/sswd",
+                    icon: "fas fa-user-secret"
+                },
+                {
+                    name: "表白网站",
+                    url: "/bblove",
+                    icon: "fas fa-heart"
+                },
+                {
+                    name: "AI聊天",
+                    url: "/aichat",
+                    icon: "fas fa-robot"
+                },
+                {
+                    name: "哔哩哔哩视频解析",
+                    url: "/bilivideo",
+                    icon: "fab fa-bilibili"
+                },
+                {
+                    name: "网站分析",
+                    url: "https://fenxi.xiaow.qzz.io",
+                    icon: "fas fa-tachometer-alt"
+                },
+            ];
+            
+            // 加载小地图数据
+            function loadSitemapData() {
+                if (sitemapDataLoaded) return;
+                
+                setTimeout(() => {
+                    sitemapContent.innerHTML = '';
+                    
+                    const sitesContainer = document.createElement('div');
+                    sitesContainer.className = 'sites-container';
+                    sitesContainer.style.display = 'grid';
+                    sitesContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+                    sitesContainer.style.gap = '20px';
+                    
+                    sitemapData.forEach(site => {
+                        const siteLink = document.createElement('a');
+                        siteLink.className = 'site-link';
+                        siteLink.href = site.url;
+                        siteLink.target = '_blank';
+                        siteLink.rel = 'noopener noreferrer';
+                        siteLink.style.cssText = `
+                            display: flex;
+                            align-items: center;
+                            gap: 15px;
+                            padding: 20px;
+                            background-color: rgba(255, 255, 255, 0.05);
+                            border-radius: 15px;
+                            color: white;
+                            text-decoration: none;
+                            transition: all 0.3s ease;
+                            border: 1px solid rgba(255, 255, 255, 0.05);
+                        `;
+                        
+                        siteLink.innerHTML = `
+                            <div style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.1); border-radius: 12px;">
+                                <i class="${site.icon}" style="font-size: 28px; color: rgba(255, 255, 255, 0.8);"></i>
+                            </div>
+                            <div style="flex-grow: 1;">
+                                <div style="font-family: 'LXGW WenKai', 'Arial', sans-serif; font-size: 18px; margin-bottom: 5px; color: white;">${site.name}</div>
+                                <div style="font-family: monospace; font-size: 13px; color: rgba(255, 255, 255, 0.6); word-break: break-all;">${site.url}</div>
+                            </div>
+                        `;
+                        
+                        // 添加悬停效果
+                        siteLink.addEventListener('mouseenter', function() {
+                            this.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                            this.style.transform = 'translateY(-5px)';
+                            this.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                            this.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.3)';
+                        });
+                        
+                        siteLink.addEventListener('mouseleave', function() {
+                            this.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                            this.style.transform = '';
+                            this.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+                            this.style.boxShadow = '';
+                        });
+                        
+                        sitesContainer.appendChild(siteLink);
+                    });
+                    
+                    sitemapContent.appendChild(sitesContainer);
+                    sitemapDataLoaded = true;
+                }, 300);
+            }
+            
+            // ESC键关闭模态框
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    if (sitemapModal.classList.contains('active')) {
+                        hideModal('sitemap');
+                    } else if (friendsModal.classList.contains('active')) {
+                        hideModal('friends');
+                    }
+                }
+            });
+            
+            // 添加�   document.addEventListener('keydown', function(e) {
+                // Tab键导航
+                if (e.key === 'Tab') {
+                    // 确保焦点在可见元素之间循环
+                    const focusableElements = document.querySelectorAll('a, button, [tabindex]:not([tabindex="-1"])');
+                    const firstElement = focusableElements[0];
+                    const lastElement = focusableElements[focusableElements.length - 1];
+                    
+                    if (e.shiftKey && document.activeElement === firstElement) {
+                        e.preventDefault();
+                        lastElement.focus();
+                    } else if (!e.shiftKey && document.activeElement === lastElement) {
+                        e.preventDefault();
+                        firstElement.focus();
+                    }
+                }
+            });
+            
+            // 页面刷新时显示加载动画
+            showLoading();
+        });
+    </script>
+<script src="/mtp/home/rocket-loader.min.js" data-cf-settings="acd9ac0b6f8f68691bad4fd8-|49" defer></script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"63f2943f588f4bc6bcec6594ef8793d8","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://fenxi.xiaow.qzz.io/tracker.min.js" data-website-id="xiao-home"></script>
 </body>
 </html>
