@@ -13,10 +13,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- 加载MDUI CSS -->
-    <link rel="stylesheet" href="/css/mdui.min.css">
+    <link rel="stylesheet" href="/mtp/home/mdui.min.css">
     
     <!-- 加载Qexo友链组件CSS -->
-    <link rel="stylesheet" href="/css/friends.css"/>
+    <link rel="stylesheet" href="/mtp/home/friends.css"/>
     
     <style>
         body {
@@ -142,7 +142,7 @@
             width: 150px;
             height: 150px;
             border-radius: 50%;
-            background-image: url('https://wp-cdn.4ce.cn/v2/TVFIv5x.jpeg');
+            background-image: url('https://img.tucang.cc/api/image/show/3c036e003432ca50b06a500bed7301b6');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -614,19 +614,20 @@
             flex-grow: 1;
         }
         
-        /* 确保Qexo友链组件在深色背景下可读 */
+        /* Qexo友链组件深色背景适配 */
         #qexo-friends {
             width: 100%;
             height: 100%;
+            color: #fff;
         }
         
-        /* 调整Qexo友链组件在模态框中的样式 */
-        .friend-card {
+        /* 友链卡片 */
+        .qexo-frienddiv {
             background-color: rgba(255, 255, 255, 0.05) !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
         
-        .friend-card:hover {
+        .qexo-frienddiv:hover {
             background-color: rgba(255, 255, 255, 0.1) !important;
             border-color: rgba(255, 255, 255, 0.2) !important;
         }
@@ -950,7 +951,7 @@
     </div>
     
     <!-- 加载MDUI JS -->
-    <script data-cfasync="false" src="/mtp/home/email-decode.min.js"></script><script src="/js/mdui.min.js" type="acd9ac0b6f8f68691bad4fd8-text/javascript"></script>
+    <script data-cfasync="false" src="/mtp/home/email-decode.min.js"></script><script src="/mtp/home/mdui.min.js" type="acd9ac0b6f8f68691bad4fd8-text/javascript"></script>
     
     <!-- 加载Qexo友链组件JS -->
     <script src="/mtp/home/friends.js"></script>
@@ -1313,7 +1314,8 @@
                 }
             });
             
-            // 添加�   document.addEventListener('keydown', function(e) {
+            // 添加键盘导航支持
+            document.addEventListener('keydown', function(e) {
                 // Tab键导航
                 if (e.key === 'Tab') {
                     // 确保焦点在可见元素之间循环
@@ -1339,3 +1341,4 @@
 <script defer src="https://fenxi.xiaow.qzz.io/tracker.min.js" data-website-id="xiao-home"></script>
 </body>
 </html>
+
