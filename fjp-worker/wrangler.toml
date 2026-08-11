@@ -1,0 +1,8 @@
+name = "fjp-worker"
+main = "worker.js"
+compatibility_date = "2025-08-11"
+compatibility_flags = ["nodejs_compat"]
+
+# 路由绑定到 fjwp.xiaow.qzz.io
+# 部署后手动在 CF Dashboard 添加路由
+# routes = [{ pattern = "fjwp.xiaow.qzz.io/*", zone_name = "qzz.io" }]
