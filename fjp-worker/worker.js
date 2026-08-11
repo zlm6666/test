@@ -18,16 +18,43 @@
  *   pwd - 提取码 (选填)
  */
 
-import { createCipheriv } from 'node:crypto';
-
 const AES_KEY = "dingHao-disk-app";
 
-function aesEncryptHex(plaintext) {
-  const key = new TextEncoder().encode(AES_KEY);
-  const cipher = createCipheriv('aes-128-ecb', key, null);
-  cipher.setAutoPadding(true);
-  const encrypted = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
-  return encrypted.toString('hex').toUpperCase();
+// 用 Web Crypto API 手动实现 AES-128-ECB
+// SubtleCrypto 的 AES-CBC 会自动加 padding。绕过方案：
+// 每个 16 字节 block 单独做 AES-CBC(zero IV) → 取前 16 字节 = ECB block
+async function aesEncryptHex(plaintext) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(plaintext);
+  const blockSize = 16;
+
+  // PKCS7 padding
+  const padLen = blockSize - (data.length % blockSize);
+  const padded = new Uint8Array(data.length + padLen);
+  padded.set(data);
+  padded.fill(padLen, data.length);
+
+  const keyBytes = encoder.encode(AES_KEY);
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw', keyBytes, { name: 'AES-CBC' }, false, ['encrypt']
+  );
+
+  const zeroIV = new Uint8Array(blockSize);
+  const result = new Uint8Array(padded.length);
+
+  for (let i = 0; i < padded.length; i += blockSize) {
+    const block = padded.slice(i, i + blockSize);
+    // AES-CBC 自动加 padding 会多出一个 block，只取前 16 字节
+    const encrypted = await crypto.subtle.encrypt(
+      { name: 'AES-CBC', iv: zeroIV }, cryptoKey, block
+    );
+    result.set(new Uint8Array(encrypted).slice(0, blockSize), i);
+  }
+
+  return Array.from(result)
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('')
+    .toUpperCase();
 }
 
 function fjUuid() {
@@ -141,7 +168,7 @@ async function handleRequest(request) {
   const password = reqUrl.searchParams.get('pwd') || null;
 
   const uuid = fjUuid();
-  const tsEncode = aesEncryptHex(Date.now().toString());
+  const tsEncode = await aesEncryptHex(Date.now().toString());
 
   try {
     // Step 1: VIP预热
@@ -209,9 +236,9 @@ ${allFiles.map((f, i) => `  [${i + 1}] ${f.fileName}`).join('\n')}</pre>`;
 
     // Step 3: 构建下载 redirect URL
     const nowTs2 = Date.now();
-    const tsEncode2 = aesEncryptHex(nowTs2.toString());
-    const fidEncode = aesEncryptHex(`${fileIds}|${userId}`);
-    const auth = aesEncryptHex(`${fileIds}|${nowTs2}`);
+    const tsEncode2 = await aesEncryptHex(nowTs2.toString());
+    const fidEncode = await aesEncryptHex(`${fileIds}|${userId}`);
+    const auth = await aesEncryptHex(`${fileIds}|${nowTs2}`);
 
     const redirectUrl = `https://api.feijipan.com/ws/file/redirect?downloadId=${fidEncode}&enable=1&devType=3&uuid=${uuid}&timestamp=${tsEncode2}&auth=${auth}&shareId=${shareId}`;
 
