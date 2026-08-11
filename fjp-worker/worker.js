@@ -183,14 +183,18 @@ async function handleRequest(request) {
     const recData = await recResp.json();
 
     if (recData.code !== 200) {
-      return errorResponse(502, '小飞机API返回错误',
-        `API 返回: ${recData.msg} (code=${recData.code})\n这可能是因为分享链接已过期或被删除。`);
+      return errorResponse(502, `小飞机API错误: ${recData.msg}`,
+        `API 返回 code=${recData.code}，msg="${recData.msg}"\n${recData.msg === '参数有误' ? '提取码可能不正确，请检查。' : '分享链接可能已过期或被删除。'}`);
     }
 
     const fileList = recData.list || [];
     if (fileList.length === 0) {
-      return errorResponse(404, '文件列表为空',
-        '未获取到任何文件。\n可能原因：链接已过期、分享被删除、或服务器暂时不可用。');
+      if (!password) {
+        return errorResponse(404, '文件列表为空 — 可能需要提取码',
+          '未获取到任何文件。\n如果此分享需要提取码，请在 URL 后加上 &pwd=提取码');
+      }
+      return errorResponse(404, '提取码可能不正确',
+        `已使用提取码 "${password}"，但未获取到文件。\n请检查提取码是否正确。`);
     }
 
     // 收集文件
