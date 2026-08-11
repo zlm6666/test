@@ -146,6 +146,24 @@ const HEADERS_DL = {
   'sec-ch-ua-platform': '"Windows"',
 };
 
+// ============ 辅助 ============
+
+async function fetchJSON(url, options = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25000);
+  try {
+    const resp = await fetch(url, { ...options, signal: controller.signal });
+    const text = await resp.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      throw new Error(`非JSON响应 (HTTP ${resp.status}): ${text.substring(0, 200)}`);
+    }
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 // ============ 主处理 ============
 
 async function handleRequest(request) {
@@ -179,8 +197,7 @@ async function handleRequest(request) {
     let recUrl = `https://api.feijipan.com/ws/recommend/list?devType=3&devModel=Chrome&uuid=${uuid}&extra=2&timestamp=${tsEncode}&shareId=${shareId}&type=0&offset=1&limit=110`;
     if (password) recUrl += `&code=${encodeURIComponent(password)}`;
 
-    const recResp = await fetch(recUrl, { method: 'POST', headers: HEADERS_API });
-    const recData = await recResp.json();
+    const recData = await fetchJSON(recUrl, { method: 'POST', headers: HEADERS_API });
 
     if (recData.code !== 200) {
       return errorResponse(502, `小飞机API错误: ${recData.msg}`,
@@ -235,14 +252,14 @@ ${allFiles.map((f, i) => `  [${i + 1}] ${f.fileName}`).join('\n')}</pre>`;
       });
     }
 
-    const fileIds = fileList[0].fileIds;
+    const fileId = allFiles[idx].fileId;
     const userId = fileList[0].userId || '';
 
     // Step 3: 构建下载 redirect URL
     const nowTs2 = Date.now();
     const tsEncode2 = await aesEncryptHex(nowTs2.toString());
-    const fidEncode = await aesEncryptHex(`${fileIds}|${userId}`);
-    const auth = await aesEncryptHex(`${fileIds}|${nowTs2}`);
+    const fidEncode = await aesEncryptHex(`${fileId}|${userId}`);
+    const auth = await aesEncryptHex(`${fileId}|${nowTs2}`);
 
     const redirectUrl = `https://api.feijipan.com/ws/file/redirect?downloadId=${fidEncode}&enable=1&devType=3&uuid=${uuid}&timestamp=${tsEncode2}&auth=${auth}&shareId=${shareId}`;
 
@@ -251,6 +268,7 @@ ${allFiles.map((f, i) => `  [${i + 1}] ${f.fileName}`).join('\n')}</pre>`;
       method: 'GET',
       headers: HEADERS_DL,
       redirect: 'manual',
+      signal: AbortSignal.timeout(25000),
     });
 
     if (dlResp.status >= 300 && dlResp.status < 400) {
@@ -260,9 +278,9 @@ ${allFiles.map((f, i) => `  [${i + 1}] ${f.fileName}`).join('\n')}</pre>`;
       }
     }
 
-    const body = await dlResp.text();
+    const respBody = await dlResp.text();
     return errorResponse(502, '获取下载链接失败',
-      `小飞机服务器返回了非预期的响应 (${dlResp.status})\n${body.substring(0, 300)}`);
+      `小飞机服务器返回了非预期的响应 (${dlResp.status})\n${respBody}\n\n调试信息:\nfileIds=${fileIds}\nuserId="${userId}"\nredirectUrl=${redirectUrl}`);
 
   } catch (err) {
     return errorResponse(500, 'Worker 内部错误', err.message);
